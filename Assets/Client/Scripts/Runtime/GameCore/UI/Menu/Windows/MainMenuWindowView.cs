@@ -33,8 +33,7 @@ namespace Client
 
         private void OnPlayButtonClick()
         {
-            //WindowsManager.Instance.OpenWindow<>();
-            Debug.Log("Click Play button");
+            WindowsManager.Instance.OpenWindow<SelectCaseWindowView>();
         }
 
         private void OnLeaderboardButtonClick()

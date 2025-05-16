@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09ab4eb6b7e24c02b3c36234f2ac9589, type: 3}
+  m_Name: LevelSet
+  m_EditorClassIdentifier: 
+  taskType: 0
+  levels:
+  - LevelNumber: 0
+    IsLock: 0
+  - LevelNumber: 1
+    IsLock: 0
+  - LevelNumber: 2
+    IsLock: 0
+  - LevelNumber: 3
+    IsLock: 1
+  - LevelNumber: 4
+    IsLock: 1
+  - LevelNumber: 5
+    IsLock: 1
+  - LevelNumber: 6
+    IsLock: 1
+  - LevelNumber: 7
+    IsLock: 1
+  - LevelNumber: 8
+    IsLock: 1
+  - LevelNumber: 9
+    IsLock: 1
+  - LevelNumber: 10
+    IsLock: 1
