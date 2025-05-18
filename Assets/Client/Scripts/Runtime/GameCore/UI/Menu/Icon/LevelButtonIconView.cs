@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 namespace Client
 {
@@ -8,28 +9,51 @@ namespace Client
     {
         [SerializeField] private TMP_Text _levelLabel;
         [SerializeField] private Image _lockImage;
-
-        private Button _button;
+        [SerializeField] private Button _button;
 
         private int _levelIndex;
         private bool _isLock;
-
-        public bool IsLock => _isLock;
-
-        public void UpdateLevel(Level levelData, int levelNumber)
+        private TaskType _taskType;
+        
+        private void OnEnable()
         {
-            _levelIndex = levelNumber;
-            _isLock = levelData.IsLock;
-            
-            CheckLevel(_isLock);
+            _button.onClick.AddListener(OnButtonClick);
         }
 
-        private void CheckLevel(bool isLock)
+        private void OnDisable()
+        {
+            _button.onClick.RemoveListener(OnButtonClick);
+        }
+
+        public void Initialize(TaskType taskType, Level levelData, int levelNumber)
+        {
+            _taskType = taskType;
+            _levelIndex = levelNumber;
+            _isLock = levelData.IsLock;
+
+            UpdateVisuals();
+        }
+
+        private void UpdateVisuals()
         {
             _levelLabel.text = _levelIndex.ToString();
-            
-            _levelLabel.gameObject.SetActive(!isLock);
-            _lockImage.gameObject.SetActive(isLock);
+
+            _levelLabel.gameObject.SetActive(!_isLock);
+            _lockImage.gameObject.SetActive(_isLock);
+            _button.interactable = !_isLock;
+        }
+
+        private void OnButtonClick()
+        {
+            if (_isLock) return;
+
+            // Save current task type and level index
+            PlayerPrefs.SetInt("CurrentTaskType", (int)_taskType);
+            PlayerPrefs.SetInt("CurrentLevelIndex", _levelIndex);
+            PlayerPrefs.Save();
+
+            // Load gameplay scene
+            SceneManager.LoadScene("GameplayScene");
         }
     }
 }
