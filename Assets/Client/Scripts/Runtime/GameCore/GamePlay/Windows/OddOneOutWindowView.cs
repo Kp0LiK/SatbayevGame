@@ -36,6 +36,11 @@ namespace Client
             _submitButton.interactable = false;
         }
 
+        protected override object GetSelectedAnswer()
+        {
+            throw new System.NotImplementedException();
+        }
+
         private void OnOptionSelected(int index)
         {
             _selectedOptionIndex = index;
@@ -49,16 +54,6 @@ namespace Client
                 colors.normalColor = i == index ? Color.yellow : Color.white;
                 button.colors = colors;
             }
-        }
-
-        protected override bool ValidateAnswer()
-        {
-            return _selectedOptionIndex == _currentTask.oddIndex;
-        }
-
-        protected override int CalculateScore()
-        {
-            return 100; // Base score for correct answer
         }
     }
 } 

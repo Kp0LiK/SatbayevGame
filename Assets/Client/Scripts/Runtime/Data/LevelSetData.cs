@@ -28,5 +28,6 @@ namespace Client
     {
         public int LevelNumber;
         public bool IsLock;
+        public List<MiniCaseTaskData> miniCaseTasks;
     }
 }

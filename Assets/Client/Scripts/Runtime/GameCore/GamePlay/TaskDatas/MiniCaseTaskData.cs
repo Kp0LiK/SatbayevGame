@@ -11,5 +11,16 @@ namespace Client
         public int correctAnswerIndex;
 
         public string GetQuestionText() => questionText;
+        
+        public TaskType GetTaskType() => TaskType.MiniCase;
+        
+        public bool ValidateAnswer(object answer)
+        {
+            if (answer is int selectedIndex)
+            {
+                return selectedIndex == correctAnswerIndex;
+            }
+            return false;
+        }
     }
 }

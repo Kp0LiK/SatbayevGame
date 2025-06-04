@@ -11,5 +11,14 @@ namespace Client
         public int oddIndex;
 
         public string GetQuestionText() => questionText;
+        public TaskType GetTaskType()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool ValidateAnswer(object answer)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

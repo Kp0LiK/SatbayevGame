@@ -34,12 +34,28 @@ namespace Client
             _spawnedLevels.Clear();
 
             var levels = LevelSystem.Instance.GetLevelsFor(_currentTaskType);
-            if (levels == null) return;
+            if (levels == null)
+            {
+                Debug.LogWarning($"[SelectLevelWindowView] No levels found for task type: {_currentTaskType}");
+                return;
+            }
+
+            Debug.Log($"[SelectLevelWindowView] Spawning {levels.Count} levels for task type: {_currentTaskType}");
 
             for (int i = 0; i < levels.Count; i++)
             {
                 var newLevel = Instantiate(_levelPrefab, _content);
-                newLevel.Initialize(_currentTaskType, levels[i], i);
+
+                // Первый уровень всегда открыт
+                bool isOpen = (i == 0);
+
+                if (!levels[i].IsLock)
+                    isOpen = true;
+
+                if (ProgressManager.Instance.IsLevelCompleted(_currentTaskType, i))
+                    isOpen = true;
+
+                newLevel.Initialize(_currentTaskType, i, isOpen);
                 _spawnedLevels.Add(newLevel);
             }
         }
@@ -47,6 +63,7 @@ namespace Client
         public void SetTaskType(TaskType taskType)
         {
             _currentTaskType = taskType;
+            Debug.Log($"[SelectLevelWindowView] Setting task type to: {taskType}");
             if (gameObject.activeInHierarchy)
             {
                 SpawnLevels();

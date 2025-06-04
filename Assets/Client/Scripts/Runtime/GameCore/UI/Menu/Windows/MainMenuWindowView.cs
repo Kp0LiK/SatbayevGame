@@ -1,3 +1,5 @@
+using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,6 +11,16 @@ namespace Client
         [SerializeField] private Button _playButton;
         [SerializeField] private Button _leaderboardButton;
         [SerializeField] private Button _settingButton;
+        
+        [SerializeField] private TMP_Text _selectedProfessionLabel;
+        
+        private Profession _selectedProfession;
+
+        private void Awake()
+        {
+            _selectedProfession = (Profession)GameSession.Instance.SelectedProfessionIndex;
+            _selectedProfessionLabel.text = $"Your profession: {_selectedProfession.ToString()}";
+        }
 
         private void OnEnable()
         {
@@ -16,7 +28,11 @@ namespace Client
             _playButton.onClick.AddListener(OnPlayButtonClick);
             _leaderboardButton.onClick.AddListener(OnLeaderboardButtonClick);
             _settingButton.onClick.AddListener(OnSettingButtonClick);
+            
+            GameSession.Instance.ProfessionSelected += OnProfessionSelected;
         }
+
+
 
         private void OnDisable()
         {
@@ -24,6 +40,14 @@ namespace Client
             _playButton.onClick.RemoveListener(OnPlayButtonClick);
             _leaderboardButton.onClick.RemoveListener(OnLeaderboardButtonClick);
             _settingButton.onClick.RemoveListener(OnSettingButtonClick);
+            
+            GameSession.Instance.ProfessionSelected += OnProfessionSelected;
+        }
+        
+        private void OnProfessionSelected(int value)
+        {
+            _selectedProfession = (Profession)value;
+            _selectedProfessionLabel.text = $"Your profession: {_selectedProfession.ToString()}";
         }
 
         private void OnChangeProfileButtonClick()

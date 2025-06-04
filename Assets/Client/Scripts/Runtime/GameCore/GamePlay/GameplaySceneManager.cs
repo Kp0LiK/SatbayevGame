@@ -5,84 +5,66 @@ namespace Client
 {
     public class GameplaySceneManager : MonoBehaviour
     {
-        [SerializeField] private GameplayManager _gameplayManager;
-        [SerializeField] private BaseGameplayWindowView _miniCaseWindow;
-        //private BaseGameplayWindowView _oddOneOutWindow;
-        //[SerializeField] private BaseGameplayWindowView _pairMatchWindow;
-        //[SerializeField] private BaseGameplayWindowView _sequenceWindow;
-
-        private void Awake()
-        {
-            GetAllWindows();
-        }
+        [SerializeField] private BaseGameplayWindowView _gameplayWindow;
+        [SerializeField] private WinWindowView _winWindow;
+        [SerializeField] private LoseWindowView _loseWindow;
 
         private void Start()
         {
-            // Get saved task type and level index
-            TaskType taskType = (TaskType)PlayerPrefs.GetInt("CurrentTaskType");
-            int levelIndex = PlayerPrefs.GetInt("CurrentLevelIndex");
+            GameplayManager.Instance.OnTaskLoaded += OnTaskLoaded;
+            GameplayManager.Instance.OnTaskCompleted += OnTaskCompleted;
+            GameplayManager.Instance.OnTaskFailed += OnTaskFailed;
 
-            // Hide all windows
-            _miniCaseWindow.gameObject.SetActive(false);
-            //_oddOneOutWindow.gameObject.SetActive(false);
-            //_pairMatchWindow.gameObject.SetActive(false);
-            //_sequenceWindow.gameObject.SetActive(false);
+            var levels = LevelSystem.Instance.GetLevelsFor(LevelLoadParams.TaskType);
+            if (levels == null || levels.Count == 0)
+            {
+                Debug.LogWarning("[GameplaySceneManager] No levels available, returning to main menu");
+                SceneManager.LoadScene("MainMenu");
+                return;
+            }
 
-            // Subscribe to gameplay events
-            _gameplayManager.OnLevelCompleted += OnLevelCompleted;
-            _gameplayManager.OnLevelFailed += OnLevelFailed;
-
-            // Start level
-            _gameplayManager.StartLevel(taskType, levelIndex);
-
-            // Show appropriate window
-            var taskData = _gameplayManager.GetCurrentTask();
-            BaseGameplayWindowView window = GetWindowForTaskType(taskType);
-            window.gameObject.SetActive(true);
-            window.Initialize(taskData);
+            GameplayManager.Instance.StartTask(LevelLoadParams.TaskType, LevelLoadParams.LevelIndex, 0);
         }
 
         private void OnDestroy()
         {
-            if (_gameplayManager != null)
+            if (GameplayManager.Instance != null)
             {
-                _gameplayManager.OnLevelCompleted -= OnLevelCompleted;
-                _gameplayManager.OnLevelFailed -= OnLevelFailed;
+                GameplayManager.Instance.OnTaskLoaded -= OnTaskLoaded;
+                GameplayManager.Instance.OnTaskCompleted -= OnTaskCompleted;
+                GameplayManager.Instance.OnTaskFailed -= OnTaskFailed;
             }
         }
 
-        private BaseGameplayWindowView GetWindowForTaskType(TaskType taskType)
+        private void OnTaskLoaded(ITaskData taskData)
         {
-            switch (taskType)
-            {
-                case TaskType.MiniCase:
-                    return _miniCaseWindow;
-                default:
-                    throw new System.ArgumentException($"Unknown task type: {taskType}");
-            }
+            _gameplayWindow.Initialize(taskData);
+            _gameplayWindow.Show();
+            _winWindow.Close();
+            _loseWindow.Close();
         }
 
-        private void GetAllWindows()
+        private void OnTaskCompleted()
         {
-            _miniCaseWindow.GetComponentInChildren<MiniCaseWindowView>();
-            //_oddOneOutWindow?.GetComponentInChildren<OddOneOutWindowView>();
+            _gameplayWindow.Hide();
+            _winWindow.Initialize(
+                GameplayManager.Instance.GetCorrectAnswersCount()
+            );
+            _winWindow.Open();
         }
 
-        private void OnLevelCompleted(int score)
+        private void OnTaskFailed()
         {
-            // TODO: Show completion window with score
-            Debug.Log($"Level completed with score: {score}");
-            ReturnToMenu();
+            _gameplayWindow.Hide();
+            _loseWindow.Open();
         }
 
-        private void OnLevelFailed()
+        public void OnRetryButtonClick()
         {
-            // TODO: Show failure window
-            Debug.Log("Level failed");
-            ReturnToMenu();
+            GameplayManager.Instance.StartTask(LevelLoadParams.TaskType, LevelLoadParams.LevelIndex, 0);
         }
 
-        private void ReturnToMenu()
+        public void OnMenuButtonClick()
         {
             SceneManager.LoadScene("MainMenu");
         }
