@@ -12,7 +12,6 @@ namespace Client
         [SerializeField] private Button _rightArrow;
 
         private List<LevelButtonIconView> _spawnedLevels;
-        private TaskType _currentTaskType;
 
         private void Awake()
         {
@@ -33,14 +32,14 @@ namespace Client
             }
             _spawnedLevels.Clear();
 
-            var levels = LevelSystem.Instance.GetLevelsFor(_currentTaskType);
+            var levels = LevelSystem.Instance.GetLevelsFor(GameplayManager.Instance.GetCurrentTaskType());
             if (levels == null)
             {
-                Debug.LogWarning($"[SelectLevelWindowView] No levels found for task type: {_currentTaskType}");
+                Debug.LogWarning($"[SelectLevelWindowView] No levels found for task type: {GameplayManager.Instance.GetCurrentTaskType()}");
                 return;
             }
 
-            Debug.Log($"[SelectLevelWindowView] Spawning {levels.Count} levels for task type: {_currentTaskType}");
+            Debug.Log($"[SelectLevelWindowView] Spawning {levels.Count} levels for task type: {GameplayManager.Instance.GetCurrentTaskType()}");
 
             for (int i = 0; i < levels.Count; i++)
             {
@@ -52,21 +51,11 @@ namespace Client
                 if (!levels[i].IsLock)
                     isOpen = true;
 
-                if (ProgressManager.Instance.IsLevelCompleted(_currentTaskType, i))
+                if (ProgressManager.Instance.IsLevelCompleted(GameplayManager.Instance.GetCurrentTaskType(), i))
                     isOpen = true;
 
-                newLevel.Initialize(_currentTaskType, i, isOpen);
+                newLevel.Initialize(i, isOpen);
                 _spawnedLevels.Add(newLevel);
-            }
-        }
-
-        public void SetTaskType(TaskType taskType)
-        {
-            _currentTaskType = taskType;
-            Debug.Log($"[SelectLevelWindowView] Setting task type to: {taskType}");
-            if (gameObject.activeInHierarchy)
-            {
-                SpawnLevels();
             }
         }
     }

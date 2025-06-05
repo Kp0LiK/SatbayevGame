@@ -1,0 +1,76 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73028a408a2f408bbb78bef80aac0683, type: 3}
+  m_Name: IT_OddOneOut
+  m_EditorClassIdentifier: 
+  Profession: 0
+  TaskType: 1
+  Levels:
+  - LevelNumber: 0
+    IsLock: 0
+    miniCaseTasks: []
+    oddOneOutTasks:
+    - questionText: Test OddOneOut
+      questionText: "\u041D\u0430\u0439\u0434\u0438 \u043B\u0438\u0448\u043D\u0435\u0435
+        =)"
+      options:
+      - text: 2
+        sprite: {fileID: 0}
+      - text: 4
+        sprite: {fileID: 0}
+      - text: 5
+        sprite: {fileID: 0}
+      - text: 6
+        sprite: {fileID: 0}
+      - text: 8
+        sprite: {fileID: 0}
+      oddIndex: 2
+    pairMatchTasks: []
+    sequenceTasks: []
+  - LevelNumber: 1
+    IsLock: 1
+    miniCaseTasks: []
+    oddOneOutTasks:
+    - questionText: Test OddOneOut 2
+      questionText: "\u041D\u0430\u0439\u0434\u0438 \u043B\u0438\u0448\u043D\u0435\u0435
+        =)"
+      options:
+      - text: 
+        sprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+      - text: 
+        sprite: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
+      - text: 
+        sprite: {fileID: 3385855733523892640, guid: edd987187b97f48b09a1e03cd01b10e8, type: 3}
+      - text: 
+        sprite: {fileID: 9120010841977082232, guid: 373f7d8c7dbbd41cea045b5aa8ad2ce0, type: 3}
+      oddIndex: 0
+    pairMatchTasks: []
+    sequenceTasks: []
+  - LevelNumber: 2
+    IsLock: 1
+    miniCaseTasks: []
+    oddOneOutTasks:
+    - questionText: Test OddOneOut 3
+      questionText: "\u041D\u0430\u0439\u0434\u0438 \u043B\u0438\u0448\u043D\u0435\u0435
+        =)"
+      options:
+      - text: text
+        sprite: {fileID: 0}
+      - text: 
+        sprite: {fileID: -7670485267309540912, guid: 8ad086aef68ed4334a6337c9abbf7784, type: 3}
+      - text: text+image
+        sprite: {fileID: 9120010841977082232, guid: 373f7d8c7dbbd41cea045b5aa8ad2ce0, type: 3}
+      - text: None
+        sprite: {fileID: 0}
+      oddIndex: 3
+    pairMatchTasks: []
+    sequenceTasks: []

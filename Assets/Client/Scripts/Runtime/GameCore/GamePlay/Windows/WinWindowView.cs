@@ -26,15 +26,17 @@ namespace Client
         {
             _correctAnswersText.text = $"Correct Answers: {correctAnswers}";
             
-            // Проверяем наличие следующего уровня
-            var levels = LevelSystem.Instance.GetLevelsFor(TaskType.MiniCase);
+            // Проверяем наличие следующего уровня для текущего типа задания
+            var taskType = GameplayManager.Instance.GetCurrentTaskType();
+            var levels = LevelSystem.Instance.GetLevelsFor(taskType);
             bool hasNextLevel = levels != null && GameplayManager.Instance.GetCurrentLevelIndex() + 1 < levels.Count;
             _nextLevelButton.gameObject.SetActive(hasNextLevel);
         }
 
         private void OnNextLevelButtonClick()
         {
-            GameplayManager.Instance.StartTask(TaskType.MiniCase, GameplayManager.Instance.GetCurrentLevelIndex() + 1);
+            var taskType = GameplayManager.Instance.GetCurrentTaskType();
+            GameplayManager.Instance.StartTask(taskType, GameplayManager.Instance.GetCurrentLevelIndex() + 1);
         }
 
         private void OnMenuButtonClick()

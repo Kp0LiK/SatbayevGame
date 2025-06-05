@@ -308,7 +308,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _backButton: {fileID: 0}
-  _itCaseButton: {fileID: 1727877348}
+  _animationType: 1
+  _miniCaseButton: {fileID: 1727877348}
+  _oddOneOutButton: {fileID: 355679003}
+  _pairMatchButton: {fileID: 876716595}
+  _sequence: {fileID: 956834014}
 --- !u!1 &51999938
 GameObject:
   m_ObjectHideFlags: 0
@@ -2880,6 +2884,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _backButton: {fileID: 1987719132}
+  _animationType: 1
   _nameInputField: {fileID: 1373220959}
   _backButton: {fileID: 1987719132}
   _professionButtons:
@@ -4459,6 +4464,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _backButton: {fileID: 1909050788}
+  _animationType: 1
 --- !u!1 &619138828
 GameObject:
   m_ObjectHideFlags: 0
@@ -7597,6 +7603,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _backButton: {fileID: 1239514241}
+  _animationType: 1
 --- !u!1 &961512405
 GameObject:
   m_ObjectHideFlags: 0
@@ -8477,6 +8484,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _allTaskSets:
   - {fileID: 11400000, guid: 3e647386992d1460393c4c1aad4807e7, type: 2}
+  - {fileID: 11400000, guid: b4e6f07fe22ab484d84f85de11b5e5cb, type: 2}
 --- !u!4 &1093227782
 Transform:
   m_ObjectHideFlags: 0
@@ -9016,6 +9024,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _backButton: {fileID: 0}
+  _animationType: 1
   _changeProfileButton: {fileID: 1142968955}
   _playButton: {fileID: 1738293113}
   _leaderboardButton: {fileID: 1322743374}
@@ -10661,6 +10670,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _backButton: {fileID: 0}
+  _animationType: 1
   _content: {fileID: 376178851}
   _levelPrefab: {fileID: 2181544355069605546, guid: ef2ac3b6d8cbf402f909ad0be4298301, type: 3}
   _leftArrow: {fileID: 1891696975}
@@ -14162,6 +14172,7 @@ MonoBehaviour:
   - {fileID: 359077140}
   - {fileID: 616169098}
   - {fileID: 959840499}
+  _animationSettings: {fileID: 11400000, guid: c25b3a511d14f40569c222e81a82dfa4, type: 2}
 --- !u!1 &1891696973
 GameObject:
   m_ObjectHideFlags: 0

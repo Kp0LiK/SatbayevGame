@@ -12,8 +12,6 @@ namespace Client
         [SerializeField] private Button _button;
 
         private int _levelIndex;
-        private TaskType _taskType;
-        
         private void OnEnable()
         {
             _button.onClick.AddListener(OnButtonClick);
@@ -24,11 +22,9 @@ namespace Client
             _button.onClick.RemoveListener(OnButtonClick);
         }
 
-        public void Initialize(TaskType taskType, int levelNumber, bool isOpen)
+        public void Initialize(int levelNumber, bool isOpen)
         {
-            _taskType = taskType;
             _levelIndex = levelNumber;
-
             UpdateVisuals(isOpen);
         }
 
@@ -43,8 +39,7 @@ namespace Client
 
         private void OnButtonClick()
         {
-            LevelLoadParams.TaskType = _taskType;
-            LevelLoadParams.LevelIndex = _levelIndex;
+            GameplayManager.Instance.SetCurrentLevelIndex(_levelIndex);
             SceneManager.LoadScene("GameplayScene");
         }
     }

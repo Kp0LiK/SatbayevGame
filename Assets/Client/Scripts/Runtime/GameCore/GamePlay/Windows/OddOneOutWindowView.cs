@@ -1,59 +1,117 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using DG.Tweening;
 
 namespace Client
 {
     public class OddOneOutWindowView : BaseGameplayWindowView
     {
-        [SerializeField] private Transform _optionsContainer;
-        [SerializeField] private Button _optionButtonPrefab;
+        [SerializeField] private Transform _itemsContainer;
+        [SerializeField] private OddOneOutItem _itemPrefab;
+        [SerializeField] private Button _hintButton;
+        [SerializeField] private TMP_Text _timerText;
+        [SerializeField] private float _timePerTask = 20f;
 
         private OddOneOutTaskData _currentTask;
-        private int _selectedOptionIndex = -1;
+        private List<OddOneOutItem> _items = new();
+        private int _selectedIndex = -1;
+        private float _timer;
+        private bool _timerActive;
+        private bool _hintUsed;
+        private int _hiddenIndex = -1;
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            _hintButton.onClick.AddListener(OnHintClicked);
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            _hintButton.onClick.RemoveListener(OnHintClicked);
+        }
+
+        private void Update()
+        {
+            if (_timerActive)
+            {
+                _timer -= Time.deltaTime;
+                _timerText.text = Mathf.CeilToInt(_timer).ToString();
+                if (_timer <= 0f)
+                {
+                    _timerActive = false;
+                    OnTimeOut();
+                }
+            }
+        }
 
         public override void Initialize(ITaskData taskData)
         {
             base.Initialize(taskData);
             _currentTask = (OddOneOutTaskData)taskData;
-            
-            // Clear previous options
-            foreach (Transform child in _optionsContainer)
+            _timer = _timePerTask;
+            _timerActive = true;
+            _hintUsed = false;
+            _hintButton.interactable = true;
+            _hiddenIndex = -1;
+            _questionText.text = taskData.GetQuestionText();
+
+            foreach (var item in _items)
+                Destroy(item.gameObject);
+            _items.Clear();
+
+            for (int i = 0; i < _currentTask.options.Count; i++)
             {
-                Destroy(child.gameObject);
+                int index = i;
+                var item = Instantiate(_itemPrefab, _itemsContainer);
+                item.Setup(_currentTask.options[i], index, OnItemSelected);
+                _items.Add(item);
+                item.transform.localScale = Vector3.zero;
+                item.transform.DOScale(1f, 0.3f).SetEase(Ease.OutBack).SetDelay(i * 0.05f);
             }
 
-            // Create option buttons
-            for (int i = 0; i < _currentTask.options.Length; i++)
-            {
-                int index = i; // Capture for lambda
-                var button = Instantiate(_optionButtonPrefab, _optionsContainer);
-                button.GetComponentInChildren<TMP_Text>().text = _currentTask.options[i];
-                button.onClick.AddListener(() => OnOptionSelected(index));
-            }
-
-            _selectedOptionIndex = -1;
+            _selectedIndex = -1;
             _submitButton.interactable = false;
         }
 
-        protected override object GetSelectedAnswer()
+        private void OnItemSelected(int index)
         {
-            throw new System.NotImplementedException();
+            if (_selectedIndex == index || !_timerActive || index == _hiddenIndex) return;
+            if (_selectedIndex != -1)
+            {
+                _items[_selectedIndex].Deselect();
+                _items[_selectedIndex].SetInteractable(true);
+            }
+            _selectedIndex = index;
+            _items[index].Select();
+            _items[index].SetInteractable(false);
+            OnAnswerSelected(index);
         }
 
-        private void OnOptionSelected(int index)
-        {
-            _selectedOptionIndex = index;
-            _submitButton.interactable = true;
+        protected override object GetSelectedAnswer() => _selectedIndex;
 
-            // Update visual selection state
-            for (int i = 0; i < _optionsContainer.childCount; i++)
+        private void OnTimeOut()
+        {
+            GameplayManager.Instance.SkipTask();
+        }
+
+        private void OnHintClicked()
+        {
+            if (_hintUsed) return;
+            _hintUsed = true;
+            _hintButton.interactable = false;
+            List<int> wrongIndexes = new();
+            for (int i = 0; i < _currentTask.options.Count; i++)
+                if (i != _currentTask.oddIndex)
+                    wrongIndexes.Add(i);
+            if (wrongIndexes.Count > 0)
             {
-                var button = _optionsContainer.GetChild(i).GetComponent<Button>();
-                var colors = button.colors;
-                colors.normalColor = i == index ? Color.yellow : Color.white;
-                button.colors = colors;
+                _hiddenIndex = wrongIndexes[Random.Range(0, wrongIndexes.Count)];
+                _items[_hiddenIndex].Hide();
             }
         }
     }
-} 
+}

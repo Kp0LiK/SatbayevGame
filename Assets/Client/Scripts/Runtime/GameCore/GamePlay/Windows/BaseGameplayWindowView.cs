@@ -57,8 +57,9 @@ namespace Client
             _submitButton.interactable = true;
         }
 
-        protected virtual void OnSubmitButtonClick()
+        private void OnSubmitButtonClick()
         {
+            Debug.Log(_isAnswerSelected);
             if (!_isAnswerSelected) return;
 
             var answer = GetSelectedAnswer();

@@ -52,15 +52,21 @@ namespace Client
             }
 
             var currentLevel = levels[levelIndex];
-            if (currentLevel.miniCaseTasks == null || currentLevel.miniCaseTasks.Count == 0)
+            var tasks = GetTasksForType(currentLevel, taskType);
+            if (tasks == null || tasks.Count == 0)
             {
-                Debug.LogError($"[GameplayManager] No questions found in level {levelIndex}");
+                Debug.LogError($"[GameplayManager] No tasks found in level {levelIndex} for type {taskType}");
                 return;
             }
 
-            Debug.Log($"[GameplayManager] Found {currentLevel.miniCaseTasks.Count} questions in level {levelIndex}");
+            Debug.Log($"[GameplayManager] Found {tasks.Count} tasks in level {levelIndex}");
             OnAttemptsChanged?.Invoke(_remainingAttempts);
             LoadCurrentTask();
+        }
+
+        private System.Collections.Generic.List<ITaskData> GetTasksForType(Level level, TaskType taskType)
+        {
+            return TaskFactory.GetTasks(level, taskType);
         }
 
         private void LoadCurrentTask()
@@ -118,7 +124,8 @@ namespace Client
 
         private void CompleteLevel()
         {
-            Debug.Log($"[GameplayManager] Completing level {_currentLevelIndex} with {_correctAnswersCount} correct answers");
+            Debug.Log(
+                $"[GameplayManager] Completing level {_currentLevelIndex} with {_correctAnswersCount} correct answers");
             ProgressManager.Instance.CompleteLevel(_currentTaskType, _currentLevelIndex, _correctAnswersCount);
             OnTaskCompleted?.Invoke();
         }
@@ -133,13 +140,14 @@ namespace Client
             }
 
             var currentLevel = levels[_currentLevelIndex];
-            if (_currentQuestionIndex >= currentLevel.miniCaseTasks.Count)
+            var tasks = GetTasksForType(currentLevel, _currentTaskType);
+            if (tasks == null || _currentQuestionIndex >= tasks.Count)
             {
                 Debug.LogWarning($"[GameplayManager] Invalid question index: {_currentQuestionIndex}");
                 return null;
             }
 
-            return currentLevel.miniCaseTasks[_currentQuestionIndex];
+            return tasks[_currentQuestionIndex];
         }
 
         public bool HasMoreTasks()
@@ -152,13 +160,16 @@ namespace Client
             }
 
             var currentLevel = levels[_currentLevelIndex];
-            bool hasMore = _currentQuestionIndex < currentLevel.miniCaseTasks.Count - 1;
+            var tasks = GetTasksForType(currentLevel, _currentTaskType);
+            bool hasMore = tasks != null && _currentQuestionIndex < tasks.Count - 1;
             Debug.Log($"[GameplayManager] Has more tasks: {hasMore}");
             return hasMore;
         }
 
         public TaskType GetCurrentTaskType() => _currentTaskType;
+        public void SetCurrentTaskType(TaskType taskType) => _currentTaskType = taskType;
         public int GetCurrentLevelIndex() => _currentLevelIndex;
+        public void SetCurrentLevelIndex(int levelIndex) => _currentLevelIndex = levelIndex;
         public int GetCurrentQuestionIndex() => _currentQuestionIndex;
         public int GetCorrectAnswersCount() => _correctAnswersCount;
         public int GetRemainingAttempts() => _remainingAttempts;

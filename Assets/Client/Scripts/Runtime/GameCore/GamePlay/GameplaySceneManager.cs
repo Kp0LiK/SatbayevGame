@@ -5,9 +5,12 @@ namespace Client
 {
     public class GameplaySceneManager : MonoBehaviour
     {
-        [SerializeField] private BaseGameplayWindowView _gameplayWindow;
+        [SerializeField] private MiniCaseWindowView _miniCaseWindow;
+        [SerializeField] private OddOneOutWindowView _oddOneOutWindow;
         [SerializeField] private WinWindowView _winWindow;
         [SerializeField] private LoseWindowView _loseWindow;
+
+        private BaseGameplayWindowView _currentWindow;
 
         private void Start()
         {
@@ -15,7 +18,7 @@ namespace Client
             GameplayManager.Instance.OnTaskCompleted += OnTaskCompleted;
             GameplayManager.Instance.OnTaskFailed += OnTaskFailed;
 
-            var levels = LevelSystem.Instance.GetLevelsFor(LevelLoadParams.TaskType);
+            var levels = LevelSystem.Instance.GetLevelsFor(GameplayManager.Instance.GetCurrentTaskType());
             if (levels == null || levels.Count == 0)
             {
                 Debug.LogWarning("[GameplaySceneManager] No levels available, returning to main menu");
@@ -23,7 +26,8 @@ namespace Client
                 return;
             }
 
-            GameplayManager.Instance.StartTask(LevelLoadParams.TaskType, LevelLoadParams.LevelIndex, 0);
+            GameplayManager.Instance.StartTask(GameplayManager.Instance.GetCurrentTaskType(),
+                GameplayManager.Instance.GetCurrentLevelIndex(), 0);
         }
 
         private void OnDestroy()
@@ -38,35 +42,44 @@ namespace Client
 
         private void OnTaskLoaded(ITaskData taskData)
         {
-            _gameplayWindow.Initialize(taskData);
-            _gameplayWindow.Show();
+            if (_currentWindow != null)
+                _currentWindow.Hide();
+
+            _currentWindow = GetWindowForTask();
+            _currentWindow.Initialize(taskData);
+            _currentWindow.Show();
+
             _winWindow.Close();
             _loseWindow.Close();
         }
 
+        private BaseGameplayWindowView GetWindowForTask()
+        {
+            switch (GameplayManager.Instance.GetCurrentTaskType())
+            {
+                case TaskType.MiniCase:
+                    return _miniCaseWindow;
+                case TaskType.OddOneOut:
+                    return _oddOneOutWindow;
+                // Добавьте другие режимы при необходимости
+                default:
+                    return _miniCaseWindow;
+            }
+        }
+
         private void OnTaskCompleted()
         {
-            _gameplayWindow.Hide();
-            _winWindow.Initialize(
-                GameplayManager.Instance.GetCorrectAnswersCount()
-            );
+            if (_currentWindow != null)
+                _currentWindow.Hide();
+            _winWindow.Initialize(GameplayManager.Instance.GetCorrectAnswersCount());
             _winWindow.Open();
         }
 
         private void OnTaskFailed()
         {
-            _gameplayWindow.Hide();
+            if (_currentWindow != null)
+                _currentWindow.Hide();
             _loseWindow.Open();
         }
-
-        public void OnRetryButtonClick()
-        {
-            GameplayManager.Instance.StartTask(LevelLoadParams.TaskType, LevelLoadParams.LevelIndex, 0);
-        }
-
-        public void OnMenuButtonClick()
-        {
-            SceneManager.LoadScene("MainMenu");
-        }
     }
-} 
+}

@@ -11,9 +11,12 @@ namespace Client
         public static WindowsManager Instance { get; private set; }
 
         [SerializeField] private List<BaseWindowView> _windowViews;
+        [SerializeField] private WindowAnimationSettings _animationSettings;
 
         private BaseWindowView _currentWindowView;
         private BaseWindowView _previousWindowView;
+
+        public WindowAnimationSettings AnimationSettings => _animationSettings;
 
         private void Awake()
         {
