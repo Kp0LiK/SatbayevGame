@@ -32,14 +32,16 @@ namespace Client
             }
             _spawnedLevels.Clear();
 
-            var levels = LevelSystem.Instance.GetLevelsFor(GameplayManager.Instance.GetCurrentTaskType());
+            var taskType = GameplayManager.Instance.GetCurrentTaskType();
+            var profession = GameplayManager.Instance.GetCurrentProfession();
+            var levels = LevelSystem.Instance.GetLevelsFor(taskType, profession);
             if (levels == null)
             {
-                Debug.LogWarning($"[SelectLevelWindowView] No levels found for task type: {GameplayManager.Instance.GetCurrentTaskType()}");
+                Debug.LogWarning($"[SelectLevelWindowView] No levels found for task type: {taskType} and profession: {profession}");
                 return;
             }
 
-            Debug.Log($"[SelectLevelWindowView] Spawning {levels.Count} levels for task type: {GameplayManager.Instance.GetCurrentTaskType()}");
+            Debug.Log($"[SelectLevelWindowView] Spawning {levels.Count} levels for task type: {taskType} and profession: {profession}");
 
             for (int i = 0; i < levels.Count; i++)
             {
@@ -51,7 +53,7 @@ namespace Client
                 if (!levels[i].IsLock)
                     isOpen = true;
 
-                if (ProgressManager.Instance.IsLevelCompleted(GameplayManager.Instance.GetCurrentTaskType(), i))
+                if (LevelSystem.Instance.IsLevelCompleted(taskType, profession, i))
                     isOpen = true;
 
                 newLevel.Initialize(i, isOpen);

@@ -26,9 +26,9 @@ namespace Client
         {
             _correctAnswersText.text = $"Correct Answers: {correctAnswers}";
             
-            // Проверяем наличие следующего уровня для текущего типа задания
             var taskType = GameplayManager.Instance.GetCurrentTaskType();
-            var levels = LevelSystem.Instance.GetLevelsFor(taskType);
+            var profession = GameplayManager.Instance.GetCurrentProfession();
+            var levels = LevelSystem.Instance.GetLevelsFor(taskType, profession);
             bool hasNextLevel = levels != null && GameplayManager.Instance.GetCurrentLevelIndex() + 1 < levels.Count;
             _nextLevelButton.gameObject.SetActive(hasNextLevel);
         }
@@ -36,7 +36,8 @@ namespace Client
         private void OnNextLevelButtonClick()
         {
             var taskType = GameplayManager.Instance.GetCurrentTaskType();
-            GameplayManager.Instance.StartTask(taskType, GameplayManager.Instance.GetCurrentLevelIndex() + 1);
+            var profession = GameplayManager.Instance.GetCurrentProfession();
+            GameplayManager.Instance.StartTask(taskType, profession, GameplayManager.Instance.GetCurrentLevelIndex() + 1);
         }
 
         private void OnMenuButtonClick()

@@ -20,6 +20,7 @@ namespace Client
         {
             _selectedProfession = (Profession)GameSession.Instance.SelectedProfessionIndex;
             _selectedProfessionLabel.text = $"Your profession: {_selectedProfession.ToString()}";
+            GameplayManager.Instance.SetCurrentProfession(_selectedProfession);
         }
 
         private void OnEnable()
@@ -48,6 +49,7 @@ namespace Client
         {
             _selectedProfession = (Profession)value;
             _selectedProfessionLabel.text = $"Your profession: {_selectedProfession.ToString()}";
+            GameplayManager.Instance.SetCurrentProfession(_selectedProfession);
         }
 
         private void OnChangeProfileButtonClick()

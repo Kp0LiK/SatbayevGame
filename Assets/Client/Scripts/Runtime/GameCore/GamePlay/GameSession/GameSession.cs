@@ -7,10 +7,10 @@ namespace Client
     {
         public static GameSession Instance { get; private set; }
 
-        private const string LEVEL_PROGRESS_KEY = "LevelProgress_{0}_{1}";
-        private const string LEVEL_SCORE_KEY = "LevelScore_{0}_{1}";
-        private const string CORRECT_ANSWERS_KEY = "CorrectAnswers_{0}_{1}";
-        private const string INCORRECT_ANSWERS_KEY = "IncorrectAnswers_{0}_{1}";
+        private const string LEVEL_PROGRESS_KEY = "LevelProgress_{0}_{1}_{2}";
+        private const string LEVEL_SCORE_KEY = "LevelScore_{0}_{1}_{2}";
+        private const string CORRECT_ANSWERS_KEY = "CorrectAnswers_{0}_{1}_{2}";
+        private const string INCORRECT_ANSWERS_KEY = "IncorrectAnswers_{0}_{1}_{2}";
         private const string PLAYER_NAME_KEY = "PlayerName";
         
         public event UnityAction<int> ProfessionSelected;
@@ -51,49 +51,48 @@ namespace Client
             InitializePlayerPrefs();
         }
 
-        public void SaveLevelProgress(TaskType taskType, int levelIndex, int score)
+        public void SaveLevelProgress(TaskType taskType, Profession profession, int levelIndex, int score)
         {
-            string progressKey = string.Format(LEVEL_PROGRESS_KEY, taskType, levelIndex);
-            string scoreKey = string.Format(LEVEL_SCORE_KEY, taskType, levelIndex);
-            string correctAnswersKey = string.Format(CORRECT_ANSWERS_KEY, taskType, levelIndex);
-            string incorrectAnswersKey = string.Format(INCORRECT_ANSWERS_KEY, taskType, levelIndex);
+            string progressKey = string.Format(LEVEL_PROGRESS_KEY, taskType, profession, levelIndex);
+            string scoreKey = string.Format(LEVEL_SCORE_KEY, taskType, profession, levelIndex);
+            string correctAnswersKey = string.Format(CORRECT_ANSWERS_KEY, taskType, profession, levelIndex);
+            string incorrectAnswersKey = string.Format(INCORRECT_ANSWERS_KEY, taskType, profession, levelIndex);
 
             PlayerPrefs.SetInt(progressKey, 1);
             
-            int currentScore = GetLevelScore(taskType, levelIndex);
+            int currentScore = GetLevelScore(taskType, profession, levelIndex);
             if (score > currentScore)
             {
                 PlayerPrefs.SetInt(scoreKey, score);
             }
             
-            // Запись правильных и неправильных ответов
-            PlayerPrefs.SetInt(correctAnswersKey, PlayerPrefs.GetInt(correctAnswersKey, 0) + 1); // Увеличиваем количество правильных ответов
-            PlayerPrefs.SetInt(incorrectAnswersKey, PlayerPrefs.GetInt(incorrectAnswersKey, 0)); // Увеличиваем количество неправильных ответов
+            PlayerPrefs.SetInt(correctAnswersKey, PlayerPrefs.GetInt(correctAnswersKey, 0) + 1);
+            PlayerPrefs.SetInt(incorrectAnswersKey, PlayerPrefs.GetInt(incorrectAnswersKey, 0));
             
             PlayerPrefs.Save();
         }
 
-        public bool IsLevelCompleted(TaskType taskType, int levelIndex)
+        public bool IsLevelCompleted(TaskType taskType, Profession profession, int levelIndex)
         {
-            string key = string.Format(LEVEL_PROGRESS_KEY, taskType, levelIndex);
+            string key = string.Format(LEVEL_PROGRESS_KEY, taskType, profession, levelIndex);
             return PlayerPrefs.GetInt(key, 0) == 1;
         }
 
-        public int GetLevelScore(TaskType taskType, int levelIndex)
+        public int GetLevelScore(TaskType taskType, Profession profession, int levelIndex)
         {
-            string key = string.Format(LEVEL_SCORE_KEY, taskType, levelIndex);
+            string key = string.Format(LEVEL_SCORE_KEY, taskType, profession, levelIndex);
             return PlayerPrefs.GetInt(key, 0);
         }
 
-        public int GetCorrectAnswers(TaskType taskType, int levelIndex)
+        public int GetCorrectAnswers(TaskType taskType, Profession profession, int levelIndex)
         {
-            string key = string.Format(CORRECT_ANSWERS_KEY, taskType, levelIndex);
+            string key = string.Format(CORRECT_ANSWERS_KEY, taskType, profession, levelIndex);
             return PlayerPrefs.GetInt(key, 0);
         }
 
-        public int GetIncorrectAnswers(TaskType taskType, int levelIndex)
+        public int GetIncorrectAnswers(TaskType taskType, Profession profession, int levelIndex)
         {
-            string key = string.Format(INCORRECT_ANSWERS_KEY, taskType, levelIndex);
+            string key = string.Format(INCORRECT_ANSWERS_KEY, taskType, profession, levelIndex);
             return PlayerPrefs.GetInt(key, 0);
         }
 
@@ -101,17 +100,20 @@ namespace Client
         {
             foreach (var taskType in System.Enum.GetValues(typeof(TaskType)))
             {
-                for (int i = 0; i < 10; i++) // Предполагаем, что у нас 10 уровней
+                foreach (var profession in System.Enum.GetValues(typeof(Profession)))
                 {
-                    string progressKey = string.Format(LEVEL_PROGRESS_KEY, taskType, i);
-                    string scoreKey = string.Format(LEVEL_SCORE_KEY, taskType, i);
-                    string correctAnswersKey = string.Format(CORRECT_ANSWERS_KEY, taskType, i);
-                    string incorrectAnswersKey = string.Format(INCORRECT_ANSWERS_KEY, taskType, i);
-                    
-                    PlayerPrefs.DeleteKey(progressKey);
-                    PlayerPrefs.DeleteKey(scoreKey);
-                    PlayerPrefs.DeleteKey(correctAnswersKey);
-                    PlayerPrefs.DeleteKey(incorrectAnswersKey);
+                    for (int i = 0; i < 10; i++) // Предполагаем, что у нас 10 уровней
+                    {
+                        string progressKey = string.Format(LEVEL_PROGRESS_KEY, taskType, profession, i);
+                        string scoreKey = string.Format(LEVEL_SCORE_KEY, taskType, profession, i);
+                        string correctAnswersKey = string.Format(CORRECT_ANSWERS_KEY, taskType, profession, i);
+                        string incorrectAnswersKey = string.Format(INCORRECT_ANSWERS_KEY, taskType, profession, i);
+                        
+                        PlayerPrefs.DeleteKey(progressKey);
+                        PlayerPrefs.DeleteKey(scoreKey);
+                        PlayerPrefs.DeleteKey(correctAnswersKey);
+                        PlayerPrefs.DeleteKey(incorrectAnswersKey);
+                    }
                 }
             }
             PlayerPrefs.Save();

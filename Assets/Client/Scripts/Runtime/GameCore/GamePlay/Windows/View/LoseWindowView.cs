@@ -23,7 +23,10 @@ namespace Client
 
         private void OnRetryButtonClick()
         {
-            GameplayManager.Instance.StartTask(GameplayManager.Instance.GetCurrentTaskType(), GameplayManager.Instance.GetCurrentLevelIndex());
+            var taskType = GameplayManager.Instance.GetCurrentTaskType();
+            var profession = GameplayManager.Instance.GetCurrentProfession();
+            var currentLevel = GameplayManager.Instance.GetCurrentLevelIndex();
+            GameplayManager.Instance.StartTask(taskType, profession, currentLevel);
             Close();
         }
 
@@ -32,4 +35,4 @@ namespace Client
             SceneManager.LoadScene("MainMenu");
         }
     }
-} 
+}

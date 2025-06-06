@@ -14,16 +14,23 @@ namespace Client
         private int _selectedOptionIndex = -1;
         private Image[] _optionImages;
 
-        public override void Initialize(ITaskData taskData)
+        protected override void ResetState()
         {
-            base.Initialize(taskData);
+            base.ResetState();
+            _selectedOptionIndex = -1;
+            _optionImages = null;
             
             // Clear previous options
             foreach (Transform child in _optionsContainer)
             {
                 Destroy(child.gameObject);
             }
+        }
 
+        public override void Initialize(ITaskData taskData)
+        {
+            base.Initialize(taskData);
+            
             var miniCaseTask = (MiniCaseTaskData)taskData;
             _optionImages = new Image[miniCaseTask.answerOptions.Length];
 

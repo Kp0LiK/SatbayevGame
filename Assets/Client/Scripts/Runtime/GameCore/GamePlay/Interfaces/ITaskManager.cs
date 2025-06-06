@@ -9,10 +9,13 @@ namespace Client
         event Action OnTaskCompleted;
         event Action OnTaskFailed;
 
-        void StartTask(TaskType taskType, int levelIndex, int taskIndex);
+        void StartTask(TaskType taskType, Profession profession, int levelIndex, int taskIndex = 0);
         void SubmitAnswer(object answer);
         void SkipTask();
         ITaskData GetCurrentTask();
         bool HasMoreTasks();
+        TaskType GetCurrentTaskType();
+        Profession GetCurrentProfession();
+        int GetCurrentLevelIndex();
     }
 } 

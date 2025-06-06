@@ -22,37 +22,50 @@ namespace Client
             }
         }
 
-        public List<Level> GetLevelsFor(TaskType taskType)
+        public List<Level> GetLevelsFor(TaskType taskType, Profession profession)
         {
-            var taskSet = _allTaskSets.Find(set => set.TaskType == taskType);
+            var taskSet = _allTaskSets.Find(set => set.TaskType == taskType && set.Profession == profession);
             if (taskSet == null) return null;
 
             return taskSet.Levels;
         }
 
-        public void CompleteLevel(TaskType taskType, int levelIndex, int correctAnswers)
+        public Level GetLevel(TaskType taskType, Profession profession, int levelIndex)
         {
-            GameSession.Instance.SaveLevelProgress(taskType, levelIndex, correctAnswers);
+            var levels = GetLevelsFor(taskType, profession);
+            if (levels == null || levelIndex >= levels.Count) return null;
+            return levels[levelIndex];
         }
 
-        public bool IsLevelCompleted(TaskType taskType, int levelIndex)
+        public bool IsLevelAvailable(TaskType taskType, Profession profession, int levelIndex)
         {
-            return GameSession.Instance.IsLevelCompleted(taskType, levelIndex);
+            if (levelIndex == 0) return true;
+            return IsLevelCompleted(taskType, profession, levelIndex - 1);
         }
 
-        public int GetLevelScore(TaskType taskType, int levelIndex)
+        public void SaveLevelProgress(TaskType taskType, Profession profession, int levelIndex, int correctAnswers)
         {
-            return GameSession.Instance.GetLevelScore(taskType, levelIndex);
+            GameSession.Instance.SaveLevelProgress(taskType, profession, levelIndex, correctAnswers);
         }
 
-        public int GetCorrectAnswers(TaskType taskType, int levelIndex)
+        public bool IsLevelCompleted(TaskType taskType, Profession profession, int levelIndex)
         {
-            return GameSession.Instance.GetCorrectAnswers(taskType, levelIndex);
+            return GameSession.Instance.IsLevelCompleted(taskType, profession, levelIndex);
         }
 
-        public int GetIncorrectAnswers(TaskType taskType, int levelIndex)
+        public int GetLevelScore(TaskType taskType, Profession profession, int levelIndex)
         {
-            return GameSession.Instance.GetIncorrectAnswers(taskType, levelIndex);
+            return GameSession.Instance.GetLevelScore(taskType, profession, levelIndex);
+        }
+
+        public int GetCorrectAnswers(TaskType taskType, Profession profession, int levelIndex)
+        {
+            return GameSession.Instance.GetCorrectAnswers(taskType, profession, levelIndex);
+        }
+
+        public int GetIncorrectAnswers(TaskType taskType, Profession profession, int levelIndex)
+        {
+            return GameSession.Instance.GetIncorrectAnswers(taskType, profession, levelIndex);
         }
 
         public void ResetProgress()

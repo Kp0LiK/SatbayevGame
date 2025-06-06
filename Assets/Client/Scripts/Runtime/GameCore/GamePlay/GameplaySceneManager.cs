@@ -7,6 +7,7 @@ namespace Client
     {
         [SerializeField] private MiniCaseWindowView _miniCaseWindow;
         [SerializeField] private OddOneOutWindowView _oddOneOutWindow;
+        [SerializeField] private PairMatchWindowView _pairMatchWindow;
         [SerializeField] private WinWindowView _winWindow;
         [SerializeField] private LoseWindowView _loseWindow;
 
@@ -18,7 +19,8 @@ namespace Client
             GameplayManager.Instance.OnTaskCompleted += OnTaskCompleted;
             GameplayManager.Instance.OnTaskFailed += OnTaskFailed;
 
-            var levels = LevelSystem.Instance.GetLevelsFor(GameplayManager.Instance.GetCurrentTaskType());
+            var levels = LevelSystem.Instance.GetLevelsFor(GameplayManager.Instance.GetCurrentTaskType(),
+                GameplayManager.Instance.GetCurrentProfession());
             if (levels == null || levels.Count == 0)
             {
                 Debug.LogWarning("[GameplaySceneManager] No levels available, returning to main menu");
@@ -27,6 +29,7 @@ namespace Client
             }
 
             GameplayManager.Instance.StartTask(GameplayManager.Instance.GetCurrentTaskType(),
+                GameplayManager.Instance.GetCurrentProfession(),
                 GameplayManager.Instance.GetCurrentLevelIndex(), 0);
         }
 
@@ -61,7 +64,8 @@ namespace Client
                     return _miniCaseWindow;
                 case TaskType.OddOneOut:
                     return _oddOneOutWindow;
-                // Добавьте другие режимы при необходимости
+                case TaskType.PairMatch:
+                    return _pairMatchWindow;
                 default:
                     return _miniCaseWindow;
             }

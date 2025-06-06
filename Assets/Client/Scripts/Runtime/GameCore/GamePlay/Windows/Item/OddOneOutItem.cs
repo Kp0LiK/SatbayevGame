@@ -10,7 +10,7 @@ namespace Client
         [SerializeField] private Button _button;
         [SerializeField] private TMP_Text _text;
         [SerializeField] private Image _image;
-        [SerializeField] private GameObject _highlight;
+        [SerializeField] private Image _highlight;
         [SerializeField] private Color _correctColor;
         [SerializeField] private Color _wrongColor;
         [SerializeField] private Color _selectedColor;
@@ -63,7 +63,7 @@ namespace Client
                 _image.gameObject.SetActive(false);
             }
 
-            _highlight.SetActive(false);
+            _highlight.gameObject.SetActive(false);
             _button.interactable = true;
             Deselect();
         }
@@ -84,8 +84,8 @@ namespace Client
 
         public void SetResult(bool isCorrect)
         {
-            _highlight.SetActive(true);
-            _highlight.GetComponent<Image>().color = isCorrect ? _correctColor : _wrongColor;
+            _highlight.gameObject.SetActive(true);
+            _highlight.color = isCorrect ? _correctColor : _wrongColor;
         }
 
         public void SetInteractable(bool value)

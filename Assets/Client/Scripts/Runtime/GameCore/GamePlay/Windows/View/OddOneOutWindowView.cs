@@ -34,6 +34,26 @@ namespace Client
             _hintButton.onClick.RemoveListener(OnHintClicked);
         }
 
+        protected override void ResetState()
+        {
+            base.ResetState();
+            _currentTask = null;
+            _selectedIndex = -1;
+            _timer = 0f;
+            _timerActive = false;
+            _hintUsed = false;
+            _hiddenIndex = -1;
+            _hintButton.interactable = true;
+            _timerText.text = string.Empty;
+
+            foreach (var item in _items)
+            {
+                if (item != null)
+                    Destroy(item.gameObject);
+            }
+            _items.Clear();
+        }
+
         private void Update()
         {
             if (_timerActive)
@@ -58,10 +78,6 @@ namespace Client
             _hintButton.interactable = true;
             _hiddenIndex = -1;
             _questionText.text = taskData.GetQuestionText();
-
-            foreach (var item in _items)
-                Destroy(item.gameObject);
-            _items.Clear();
 
             for (int i = 0; i < _currentTask.options.Count; i++)
             {

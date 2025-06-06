@@ -16,6 +16,7 @@ namespace Client
         public event Action<int> OnAttemptsChanged;
 
         [SerializeField] private TaskType _currentTaskType;
+        [SerializeField] private Profession _currentProfession;
         [SerializeField] private int _currentLevelIndex;
         [SerializeField] private int _currentQuestionIndex;
         [SerializeField] private int _correctAnswersCount;
@@ -34,39 +35,34 @@ namespace Client
             }
         }
 
-        public void StartTask(TaskType taskType, int levelIndex, int taskIndex = 0)
+        public void StartTask(TaskType taskType, Profession profession, int levelIndex, int taskIndex = 0)
         {
-            Debug.Log($"[GameplayManager] Starting task: Type={taskType}, Level={levelIndex}, Task={taskIndex}");
+            Debug.Log($"[GameplayManager] Starting task: Type={taskType}, Profession={profession}, Level={levelIndex}, Task={taskIndex}");
 
             _currentTaskType = taskType;
+            _currentProfession = profession;
             _currentLevelIndex = levelIndex;
             _currentQuestionIndex = taskIndex;
             _correctAnswersCount = 0;
             _remainingAttempts = MAX_ATTEMPTS;
 
-            var levels = LevelSystem.Instance.GetLevelsFor(taskType);
-            if (levels == null || levelIndex >= levels.Count)
+            var currentLevel = LevelSystem.Instance.GetLevel(taskType, profession, levelIndex);
+            if (currentLevel == null)
             {
-                Debug.LogError($"[GameplayManager] Level {levelIndex} not found for task type {taskType}");
+                Debug.LogError($"[GameplayManager] Level {levelIndex} not found for task type {taskType} and profession {profession}");
                 return;
             }
 
-            var currentLevel = levels[levelIndex];
-            var tasks = GetTasksForType(currentLevel, taskType);
+            var tasks = TaskFactory.GetTasks(currentLevel, taskType);
             if (tasks == null || tasks.Count == 0)
             {
-                Debug.LogError($"[GameplayManager] No tasks found in level {levelIndex} for type {taskType}");
+                Debug.LogError($"[GameplayManager] No tasks found in level {levelIndex} for type {taskType} and profession {profession}");
                 return;
             }
 
             Debug.Log($"[GameplayManager] Found {tasks.Count} tasks in level {levelIndex}");
             OnAttemptsChanged?.Invoke(_remainingAttempts);
             LoadCurrentTask();
-        }
-
-        private System.Collections.Generic.List<ITaskData> GetTasksForType(Level level, TaskType taskType)
-        {
-            return TaskFactory.GetTasks(level, taskType);
         }
 
         private void LoadCurrentTask()
@@ -92,14 +88,24 @@ namespace Client
                 return;
             }
 
-            bool isCorrect = currentTask.ValidateAnswer(answer);
-            Debug.Log($"[GameplayManager] Answer submitted: {(isCorrect ? "Correct" : "Incorrect")}");
-            OnAnswerSubmitted?.Invoke(isCorrect);
+            int correctCount = 0;
+            bool isCorrect = false;
 
-            if (isCorrect)
+            if (answer is Client.PairMatchWindowView.PairMatchResult pmr)
             {
-                _correctAnswersCount++;
+                isCorrect = pmr.IsWin;
+                correctCount = pmr.CorrectCount;
             }
+            else
+            {
+                isCorrect = currentTask.ValidateAnswer(answer);
+                correctCount = isCorrect ? 1 : 0;
+            }
+
+            Debug.Log($"[GameplayManager] Answer submitted: {(isCorrect ? "Correct" : "Incorrect")}, CorrectCount: {correctCount}");
+            _correctAnswersCount += correctCount;
+
+            OnAnswerSubmitted?.Invoke(isCorrect);
 
             _currentQuestionIndex++;
             LoadCurrentTask();
@@ -124,23 +130,32 @@ namespace Client
 
         private void CompleteLevel()
         {
-            Debug.Log(
-                $"[GameplayManager] Completing level {_currentLevelIndex} with {_correctAnswersCount} correct answers");
-            ProgressManager.Instance.CompleteLevel(_currentTaskType, _currentLevelIndex, _correctAnswersCount);
+            Debug.Log($"[GameplayManager] Completing level {_currentLevelIndex} with {_correctAnswersCount} correct answers");
+            LevelSystem.Instance.SaveLevelProgress(_currentTaskType, _currentProfession, _currentLevelIndex, _correctAnswersCount);
             OnTaskCompleted?.Invoke();
+        }
+
+        public void SuccessCompleteLevel(int correctAnswers)
+        {
+            _correctAnswersCount = correctAnswers;
+            OnTaskCompleted?.Invoke();
+        }
+
+        public void LoseLevel()
+        {
+            OnTaskFailed?.Invoke();
         }
 
         public ITaskData GetCurrentTask()
         {
-            var levels = LevelSystem.Instance.GetLevelsFor(_currentTaskType);
-            if (levels == null || _currentLevelIndex >= levels.Count)
+            var currentLevel = LevelSystem.Instance.GetLevel(_currentTaskType, _currentProfession, _currentLevelIndex);
+            if (currentLevel == null)
             {
                 Debug.LogWarning($"[GameplayManager] Invalid level index: {_currentLevelIndex}");
                 return null;
             }
 
-            var currentLevel = levels[_currentLevelIndex];
-            var tasks = GetTasksForType(currentLevel, _currentTaskType);
+            var tasks = TaskFactory.GetTasks(currentLevel, _currentTaskType);
             if (tasks == null || _currentQuestionIndex >= tasks.Count)
             {
                 Debug.LogWarning($"[GameplayManager] Invalid question index: {_currentQuestionIndex}");
@@ -152,24 +167,25 @@ namespace Client
 
         public bool HasMoreTasks()
         {
-            var levels = LevelSystem.Instance.GetLevelsFor(_currentTaskType);
-            if (levels == null || _currentLevelIndex >= levels.Count)
+            var currentLevel = LevelSystem.Instance.GetLevel(_currentTaskType, _currentProfession, _currentLevelIndex);
+            if (currentLevel == null)
             {
                 Debug.LogWarning($"[GameplayManager] Invalid level index: {_currentLevelIndex}");
                 return false;
             }
 
-            var currentLevel = levels[_currentLevelIndex];
-            var tasks = GetTasksForType(currentLevel, _currentTaskType);
+            var tasks = TaskFactory.GetTasks(currentLevel, _currentTaskType);
             bool hasMore = tasks != null && _currentQuestionIndex < tasks.Count - 1;
             Debug.Log($"[GameplayManager] Has more tasks: {hasMore}");
             return hasMore;
         }
 
         public TaskType GetCurrentTaskType() => _currentTaskType;
-        public void SetCurrentTaskType(TaskType taskType) => _currentTaskType = taskType;
+        public TaskType SetCurrentTaskType(TaskType taskType) => _currentTaskType = taskType;
         public int GetCurrentLevelIndex() => _currentLevelIndex;
-        public void SetCurrentLevelIndex(int levelIndex) => _currentLevelIndex = levelIndex;
+        public int SetCurrentLevelIndex(int levelIndex) => _currentLevelIndex = levelIndex;
+        public Profession GetCurrentProfession() => _currentProfession;
+        public Profession SetCurrentProfession(Profession profession) => _currentProfession = profession;
         public int GetCurrentQuestionIndex() => _currentQuestionIndex;
         public int GetCorrectAnswersCount() => _correctAnswersCount;
         public int GetRemainingAttempts() => _remainingAttempts;
