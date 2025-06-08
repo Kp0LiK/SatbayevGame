@@ -16,6 +16,8 @@ namespace Client
             _oddOneOutButton.onClick.AddListener(OnOddOneOutButtonClick);
             _pairMatchButton.onClick.AddListener(OnPairMatchButtonClick);
             _sequence.onClick.AddListener(OnSequenceButtonClick);
+            
+            BackButton.onClick.AddListener(OnBackButtonClick);
         }
 
         private void OnDisable()
@@ -24,6 +26,8 @@ namespace Client
             _oddOneOutButton.onClick.RemoveListener(OnOddOneOutButtonClick);
             _pairMatchButton.onClick.RemoveListener(OnPairMatchButtonClick);
             _sequence.onClick.RemoveListener(OnSequenceButtonClick);
+            
+            BackButton.onClick.RemoveListener(OnBackButtonClick);
         }
 
         private void OnButtonClick()
@@ -48,6 +52,11 @@ namespace Client
         {
             GameplayManager.Instance.SetCurrentTaskType(TaskType.Sequence);
             WindowsManager.Instance.OpenWindow<SelectLevelWindowView>();
+        }
+
+        private void OnBackButtonClick()
+        {
+            WindowsManager.Instance.BackWindow();
         }
     }
 }

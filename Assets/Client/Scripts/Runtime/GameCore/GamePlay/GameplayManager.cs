@@ -91,7 +91,7 @@ namespace Client
             int correctCount = 0;
             bool isCorrect = false;
 
-            if (answer is Client.PairMatchWindowView.PairMatchResult pmr)
+            if (answer is PairMatchWindowView.PairMatchResult pmr)
             {
                 isCorrect = pmr.IsWin;
                 correctCount = pmr.CorrectCount;
@@ -132,7 +132,14 @@ namespace Client
         {
             Debug.Log($"[GameplayManager] Completing level {_currentLevelIndex} with {_correctAnswersCount} correct answers");
             LevelSystem.Instance.SaveLevelProgress(_currentTaskType, _currentProfession, _currentLevelIndex, _correctAnswersCount);
-            OnTaskCompleted?.Invoke();
+            if (_correctAnswersCount <= 0)
+            {
+                LoseLevel();
+            }
+            else
+            {
+                OnTaskCompleted?.Invoke();
+            }
         }
 
         public void SuccessCompleteLevel(int correctAnswers)
